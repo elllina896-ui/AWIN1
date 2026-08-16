@@ -4,248 +4,161 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Awin — Sign in</title>
+<meta name="description" content="Sign in to Awin — campaigns & partner management" />
 <style>
-  /* ====== Config / tokens ====== */
+  /* =======================
+     Tokens / quick notes:
+     - Replace the inline SVG with your real logo file or a base64-embedded PNG/SVG if you want the exact AWIN logo.
+     - Replace the .bg background-image with your bokeh/bg.jpg for the pictured effect.
+     ======================= */
   :root{
-    --bg-fallback: linear-gradient(180deg,#e9edf0,#f8f9fb);
-    --card-bg: rgba(255,255,255,0.95);
-    --muted: #333842;
-    --accent-start: #ff9a2e; /* gradient start */
-    --accent-end: #ff3a5f;   /* gradient end */
-    --input-radius: 999px;   /* pill */
-    --input-height: 54px;
-    --form-width: min(640px, 86vw);
-    --logo-max-width: 320px;
-    --glass-opacity: 0.55;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Helvetica Neue";
+    --accent-start:#ff9a2e;
+    --accent-end:#ff3a5f;
+    --muted:#111316;
+    --input-radius:999px;
+    --input-height:56px;
+    --form-width:min(700px,86vw);
+    --logo-max-width:320px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
-  /* ====== Page layout ====== */
-  html,body { height:100%; margin:0; }
+  html,body{height:100%;margin:0}
   body{
     min-height:100vh;
-    background: var(--bg-fallback);
     display:flex;
     align-items:center;
     justify-content:center;
+    background:linear-gradient(180deg,#f3f5f7,#ffffff);
     color:var(--muted);
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
 
-  /* Background image layer (replace url) */
-  .bg {
+  /* Background "bokeh-like" pattern created with layered radial gradients.
+     Replace the .bg background-image URL with your real photo for the exact look. */
+  .bg{
     position:fixed;
     inset:0;
-    background-image: url('bg.jpg'); /* <-- replace with your background image path or keep fallback */
-    background-size:cover;
-    background-position:center;
-    filter: saturate(1.05) brightness(0.98);
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,0.35) 0 2px, transparent 2px),
+      radial-gradient(circle at 80% 30%, rgba(255,255,255,0.25) 0 3px, transparent 3px),
+      radial-gradient(circle at 40% 70%, rgba(255,255,255,0.18) 0 4px, transparent 4px),
+      linear-gradient(180deg, rgba(250,250,251,0.9), rgba(244,247,250,0.95));
+    background-size: 220px 220px, 300px 300px, 260px 260px, cover;
+    background-position: center;
+    filter: blur(0.6px) saturate(1.02) brightness(0.98);
     z-index:-3;
   }
-  /* subtle overlay for readability */
   .overlay {
-    position:fixed;
-    inset:0;
-    background: rgba(255,255,255,0.25);
+    position:fixed; inset:0;
+    background: rgba(255,255,255,0.24);
     backdrop-filter: blur(3px);
     z-index:-2;
   }
 
-  /* Main centered panel (but visually minimal - inputs float) */
-  .wrap{
+  main.wrap{
     width:100%;
-    padding:40px 24px;
+    padding:36px 20px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:22px;
+    gap:18px;
   }
-
-  .logo-area{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:14px;
-  }
-  .logo-img{
-    width:var(--logo-max-width);
-    max-width:56vw;
-    height:auto;
-  }
-  .logo-title{
-    letter-spacing:8px;
-    font-weight:700;
-    font-size:48px;
-    color:#0b1216;
-    margin:0;
-  }
-
-  /* Form card is mostly invisible—we render centered form controls */
-  .auth{
-    width:100%;
-    max-width:var(--form-width);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:12px;
-    margin-top:6px;
-  }
-
-  label{
-    align-self:flex-start;
-    margin-left:6px;
-    font-size:14px;
-    color:rgba(11,18,26,0.9);
-    margin-bottom:6px;
-  }
-
-  .field{
-    position:relative;
-    width:100%;
-  }
-
-  .input {
-    height:var(--input-height);
-    width:100%;
-    padding:0 56px 0 22px; /* leave space for icons on right */
-    border-radius:var(--input-radius);
-    border: 1px solid rgba(11,18,26,0.08);
-    background: rgba(255,255,255, var(--glass-opacity));
-    font-size:16px;
-    outline:none;
-    box-shadow: 0 6px 18px rgba(11,18,26,0.06);
-    transition: box-shadow .16s, border-color .12s, transform .06s;
-    color:#0b1220;
-    -webkit-appearance:none;
-  }
-  .input::placeholder { color: #9aa0a6; }
-
-  .input:focus{
-    border-color: rgba(11,18,26,0.14);
-    box-shadow: 0 10px 30px rgba(11,18,26,0.10);
-  }
-
-  /* Eye icon button */
-  .icon-button{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    width:36px;
-    height:36px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:999px;
-    background:transparent;
-    border:0;
-    cursor:pointer;
-    color:#5b6166;
-  }
-  .icon-button:focus{ outline:2px solid rgba(0,0,0,0.06); }
-
-  /* custom remember checkbox styled as small circle */
-  .remember {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    width:100%;
-    margin-left:6px;
-    color:rgba(11,18,26,0.85);
-    font-size:15px;
-  }
-  .remember input[type="checkbox"]{
-    appearance:none;
-    width:18px; height:18px;
-    border-radius:999px;
-    border:1.5px solid rgba(11,18,26,0.14);
-    background:white;
-    display:inline-block;
-    position:relative;
-    cursor:pointer;
-  }
-  .remember input[type="checkbox"]:checked{
-    background: linear-gradient(90deg,var(--accent-start),var(--accent-end));
-    border: none;
-  }
-  .remember input[type="checkbox"]:checked::after{
-    content:'';
-    position:absolute;
-    left:5px; top:5px;
-    width:6px; height:6px;
-    border-radius:50%;
-    background: white;
-  }
-
-  /* Sign-in pill button */
-  .btn-sign{
-    width:100%;
-    height:56px;
-    border-radius:999px;
-    border:0;
-    color:white;
-    font-weight:700;
-    font-size:18px;
-    cursor:pointer;
-    background: linear-gradient(90deg,var(--accent-start),var(--accent-end));
-    box-shadow: 0 10px 30px rgba(255,90,90,0.12);
-    transition: transform .08s, box-shadow .12s, opacity .12s;
-  }
-  .btn-sign:active{ transform: translateY(1px) }
-  .btn-sign:disabled{ opacity:0.6; cursor:default; }
-
-  /* Sign up link under button */
-  .below{
-    margin-top:6px;
-    font-size:14px;
-    color:rgba(11,18,26,0.85);
-  }
-  .below a{ color:var(--accent-end); font-weight:600; text-decoration:underline; text-underline-offset:3px }
 
   /* Top-right language button */
   .lang-btn{
     position:fixed;
     top:18px;
     right:18px;
-    width:42px; height:42px;
-    border-radius:22px;
-    display:flex; align-items:center; justify-content:center;
-    background: rgba(11,18,26,0.08);
-    border:1px solid rgba(255,255,255,0.06);
+    width:44px;height:44px;border-radius:999px;
+    background: rgba(17,19,22,0.06);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,0.04);
     z-index:10;
   }
 
   /* Chat bubble bottom-right */
   .chat{
-    position:fixed;
-    right:22px;
-    bottom:22px;
+    position:fixed; right:22px; bottom:22px;
     width:56px;height:56px;border-radius:999px;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(180deg,#2bb7ff,#0b8cff);
     box-shadow:0 12px 30px rgba(11,18,26,0.18);
-    color:white;
-    z-index:12;
-    cursor:pointer;
+    color:white; z-index:12; cursor:pointer;
   }
 
-  /* Responsive tweaks */
+  .brand{
+    display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:12px;
+  }
+  .brand img.logo, .brand svg.logo{
+    width:var(--logo-max-width); max-width:56vw; height:auto; display:block;
+  }
+  .brand h1{
+    margin:0; font-size:48px; letter-spacing:6px; font-weight:800; color:var(--muted);
+  }
+
+  .auth{
+    width:100%; max-width:var(--form-width); display:flex;flex-direction:column;align-items:center; gap:12px;
+    margin-top:6px;
+  }
+
+  label{
+    display:block; font-size:14px; color:rgba(17,19,22,0.9); margin-left:6px; margin-bottom:6px;
+  }
+
+  .field{ position:relative; width:100%; }
+
+  input.input{
+    width:100%;
+    height:var(--input-height);
+    padding:0 56px 0 22px;
+    border-radius:var(--input-radius);
+    border:1px solid rgba(11,18,26,0.08);
+    background: rgba(255,255,255,0.88);
+    font-size:16px; color:var(--muted);
+    box-shadow:0 8px 22px rgba(11,18,26,0.06);
+    outline:none;
+    transition:box-shadow .12s, border-color .1s;
+  }
+  .input::placeholder{ color:#9aa0a6; }
+  .input:focus{ border-color: rgba(11,18,26,0.14); box-shadow:0 12px 30px rgba(11,18,26,0.10); }
+
+  .icon-button{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    width:36px;height:36px;border-radius:999px;border:0;background:transparent;cursor:pointer;color:#5b6166;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+
+  .remember-row{ display:flex; align-items:center; justify-content:space-between; width:100%; margin-top:6px; }
+  .remember{ display:flex;align-items:center;gap:10px;font-size:15px;color:rgba(11,18,26,0.85); margin-left:6px; }
+  .remember input[type="checkbox"]{
+    -webkit-appearance:none; appearance:none; width:18px;height:18px;border-radius:999px; border:1.5px solid rgba(11,18,26,0.14); background:white; position:relative; cursor:pointer;
+  }
+  .remember input[type="checkbox"]:checked{ background:linear-gradient(90deg,var(--accent-start),var(--accent-end)); border: none; }
+  .remember input[type="checkbox"]:checked::after{ content:''; position:absolute; left:5px; top:5px; width:6px; height:6px; border-radius:50%; background:white; }
+
+  .btn-sign{
+    width:100%; height:56px; border-radius:999px; border:0; cursor:pointer;
+    background:linear-gradient(90deg,var(--accent-start),var(--accent-end)); color:white; font-weight:800; font-size:18px;
+    box-shadow:0 10px 30px rgba(255,90,90,0.12);
+  }
+
+  .below { margin-top:8px; font-size:14px; color:rgba(11,18,26,0.85); text-align:center; width:100%;}
+  .below a{ color:var(--accent-end); font-weight:700; text-decoration:underline; text-underline-offset:3px; }
+
   @media (max-width:720px){
-    .logo-title{ font-size:34px; letter-spacing:6px; }
-    .auth{ padding:0 8px; }
+    .brand h1{ font-size:36px; letter-spacing:4px; }
+    .auth{ padding:0 12px; }
     label{ margin-left:0; }
   }
 </style>
 </head>
 <body>
-  <!-- Background layers. Replace bg.jpg with your bokeh / pattern image. -->
   <div class="bg" aria-hidden="true"></div>
   <div class="overlay" aria-hidden="true"></div>
 
-  <!-- language button -->
+  <!-- language -->
   <button class="lang-btn" aria-label="Change language" title="Language">
-    <!-- globe icon -->
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 2v2a6 6 0 110 12v2a8 8 0 100-16z" fill="#111"/>
     </svg>
@@ -259,15 +172,29 @@
   </button>
 
   <main class="wrap" role="main" aria-labelledby="signin-heading">
-    <div class="logo-area" aria-hidden="false">
-      <!-- Replace src with your exact AWIN logo file in production.
-           If you want me to embed the Wikimedia PNG as base64, say "embed exact". -->
-      <img class="logo-img" src="awin-logo.png" alt="Awin" />
-      <h1 id="signin-heading" class="logo-title">AWIN</h1>
+    <div class="brand" aria-hidden="false">
+      <!-- Inline logo (visible immediately). Replace the <svg> below with:
+           <img src="AWIN_AG_logo.png" alt="Awin" class="logo" />
+           or with a base64 data URL if you want to avoid external requests. -->
+      <svg class="logo" width="320" height="96" viewBox="0 0 320 96" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="awinTitle">
+        <title id="awinTitle">Awin</title>
+        <!-- simple illustrative mark + wordmark (not official) -->
+        <g transform="translate(0,0)">
+          <!-- mark -->
+          <g transform="translate(96,0) scale(0.9)">
+            <polygon points="24,0 40,36 24,24 8,36" fill="#ff6a00"/>
+            <polygon points="24,0 32,36 24,24 16,36" fill="#ff3a5f" opacity="0.95"/>
+            <polygon points="24,0 44,30 24,20 4,30" fill="#ffc24a" opacity="0.9"/>
+          </g>
+          <!-- word -->
+          <text x="140" y="62" font-family="Inter, Arial, Helvetica, sans-serif" font-weight="800" font-size="54" fill="#111119">AWIN</text>
+        </g>
+      </svg>
+
+      <h1 id="signin-heading" style="margin:0">AWIN</h1>
     </div>
 
-    <section class="auth" aria-label="Sign in form">
-      <!-- Username -->
+    <section class="auth" aria-label="Sign in">
       <div style="width:100%">
         <label for="username">Username / Phone</label>
         <div class="field">
@@ -275,11 +202,10 @@
         </div>
       </div>
 
-      <!-- Password with eye -->
       <div style="width:100%">
         <label for="password">Password</label>
         <div class="field">
-          <input id="password" class="input" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-describedby="pwd-help" />
+          <input id="password" class="input" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-describedby="pwd-note" />
           <button class="icon-button" id="pwd-toggle" type="button" aria-pressed="false" aria-controls="password" title="Show password">
             <!-- eye icon -->
             <svg id="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -292,56 +218,57 @@
             </svg>
           </button>
         </div>
-        <div id="pwd-help" style="font-size:13px;color:rgba(11,18,26,0.6);margin-left:6px;margin-top:8px">We'll never share your password.</div>
+        <div id="pwd-note" style="font-size:13px;color:rgba(11,18,26,0.6);margin-left:6px;margin-top:8px">We'll never share your password.</div>
       </div>
 
-      <!-- remember + sign in -->
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:6px">
-        <label class="remember"><input id="remember" type="checkbox" aria-checked="false" /> Remember me</label>
+      <div class="remember-row">
+        <label class="remember"><input id="remember" type="checkbox" /> Remember me</label>
         <a href="#" style="color:rgba(11,18,26,0.75);text-decoration:none;font-size:14px">Forgot password?</a>
       </div>
 
-      <div style="width:100%;margin-top:12px">
+      <div style="width:100%;margin-top:10px">
         <button id="signin" class="btn-sign" type="button">Sign in</button>
       </div>
 
-      <div class="below" style="text-align:center;width:100%;">Don't have an account? <a href="#">Sign up</a></div>
+      <div class="below">Don't have an account? <a href="#">Sign up</a></div>
     </section>
   </main>
 
 <script>
   // Password show/hide
-  const pwdInput = document.getElementById('password');
-  const toggle = document.getElementById('pwd-toggle');
-  const eyeOpen = document.getElementById('eye-open');
-  const eyeClosed = document.getElementById('eye-closed');
+  (function(){
+    const pwdInput = document.getElementById('password');
+    const toggle = document.getElementById('pwd-toggle');
+    const eyeOpen = document.getElementById('eye-open');
+    const eyeClosed = document.getElementById('eye-closed');
 
-  toggle.addEventListener('click', ()=>{
-    const isHidden = pwdInput.type === 'password';
-    if(isHidden){
-      pwdInput.type = 'text';
-      toggle.setAttribute('aria-pressed','true');
-      eyeOpen.style.display = 'none';
-      eyeClosed.style.display = 'block';
-      toggle.title = 'Hide password';
-    } else {
-      pwdInput.type = 'password';
-      toggle.setAttribute('aria-pressed','false');
-      eyeOpen.style.display = 'block';
-      eyeClosed.style.display = 'none';
-      toggle.title = 'Show password';
-    }
-  });
+    toggle.addEventListener('click', ()=>{
+      const isHidden = pwdInput.type === 'password';
+      if(isHidden){
+        pwdInput.type = 'text';
+        toggle.setAttribute('aria-pressed','true');
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'block';
+        toggle.title = 'Hide password';
+      } else {
+        pwdInput.type = 'password';
+        toggle.setAttribute('aria-pressed','false');
+        eyeOpen.style.display = 'block';
+        eyeClosed.style.display = 'none';
+        toggle.title = 'Show password';
+      }
+    });
 
-  // Demo sign-in placeholder: replace with real fetch / auth integration
-  document.getElementById('signin').addEventListener('click', ()=>{
-    const user = document.getElementById('username').value.trim();
-    const pass = pwdInput.value;
-    if(!user){ alert('Please enter username/phone'); return; }
-    if(!pass){ alert('Please enter password'); return; }
-    // TODO: replace with actual API call (fetch/axios) and proper error handling
-    alert('Sign in submitted (demo)');
-  });
+    // demo sign-in placeholder: replace with fetch/axios integration
+    document.getElementById('signin').addEventListener('click', ()=>{
+      const user = document.getElementById('username').value.trim();
+      const pass = pwdInput.value;
+      if(!user){ alert('Please enter username / phone'); return; }
+      if(!pass){ alert('Please enter password'); return; }
+      // TODO: Replace with real API request to your backend
+      alert('Sign in submitted (demo)');
+    });
+  })();
 </script>
 </body>
 </html>
